@@ -1,6 +1,8 @@
 import { useEffect } from "react";
-import { X, ChevronLeft, ChevronRight, Download } from "lucide-react";
+import { X, ChevronLeft, ChevronRight, Download, Clock } from "lucide-react";
 import type { SlideState } from "@/hooks/useDeckGenerator";
+import { formatDuration } from "@/hooks/useNow";
+import { formatUsd } from "@/lib/pricing";
 
 type Props = {
   slides: SlideState[];
@@ -56,6 +58,19 @@ export function SlideLightbox({ slides, index, onClose, onIndexChange }: Props) 
               Slide {index + 1} of {slides.length} · {slide.plan.role}
             </div>
             <div className="text-lg font-semibold">{slide.plan.title}</div>
+            {(slide.durationMs != null || slide.costUsd != null) && (
+              <div className="mt-1 flex items-center gap-3 text-xs text-white/50">
+                {slide.durationMs != null && (
+                  <span className="inline-flex items-center gap-1 tabular-nums">
+                    <Clock className="size-3" />
+                    {formatDuration(slide.durationMs)}
+                  </span>
+                )}
+                {slide.costUsd != null && (
+                  <span className="tabular-nums">~{formatUsd(slide.costUsd)}</span>
+                )}
+              </div>
+            )}
           </div>
           {slide.dataUrl && (
             <a

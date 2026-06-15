@@ -2,6 +2,7 @@ import { useCallback, useRef, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { planDeck, refineChat, type DeckPlan, type SlidePlan } from "@/lib/deck.functions";
 import { streamImage } from "@/lib/streamImage";
+import { costFromUsage, estimateImageCost, type ImageUsage } from "@/lib/pricing";
 import type { UploadedRef } from "@/lib/uploads";
 
 export type StylePreset = "creative" | "balanced" | "data";
@@ -30,6 +31,17 @@ export type SlideState = {
   status: SlideStatus;
   dataUrl: string | null;
   error: string | null;
+  startedAt: number | null;
+  durationMs: number | null;
+  usage: ImageUsage | null;
+  costUsd: number | null;
+};
+
+export type DeckTimings = {
+  planStartedAt: number | null;
+  planMs: number | null;
+  renderStartedAt: number | null;
+  renderEndedAt: number | null;
 };
 
 export type DeckStatus =
@@ -54,6 +66,12 @@ export function useDeckGenerator() {
   const [error, setError] = useState<string | null>(null);
   const [chat, setChat] = useState<ChatMessage[]>([]);
   const [formOpts, setFormOpts] = useState<GenerateOptions | null>(null);
+  const [timings, setTimings] = useState<DeckTimings>({
+    planStartedAt: null,
+    planMs: null,
+    renderStartedAt: null,
+    renderEndedAt: null,
+  });
   const slidesRef = useRef<SlideState[]>([]);
   const sizeRef = useRef<string>("1536x1024");
   const aspectStateRef = useRef<Aspect>("16:9");
@@ -67,9 +85,18 @@ export function useDeckGenerator() {
   };
 
   const renderOne = useCallback(async (slide: SlidePlan, promptOverride?: string) => {
-    updateSlide(slide.index, { status: "streaming", error: null, dataUrl: null });
+    const startedAt = Date.now();
+    updateSlide(slide.index, {
+      status: "streaming",
+      error: null,
+      dataUrl: null,
+      startedAt,
+      durationMs: null,
+      usage: null,
+      costUsd: null,
+    });
     try {
-      await streamImage(
+      const { usage } = await streamImage(
         "/api/generate-slide",
         promptOverride ?? slide.imagePrompt,
         (dataUrl, isFinal) => {
@@ -80,8 +107,19 @@ export function useDeckGenerator() {
         },
         { size: sizeRef.current },
       );
+      const costUsd = usage ? costFromUsage(usage) : estimateImageCost(sizeRef.current, "high");
+      updateSlide(slide.index, {
+        status: "done",
+        durationMs: Date.now() - startedAt,
+        usage: usage ?? null,
+        costUsd,
+      });
     } catch (e) {
-      updateSlide(slide.index, { status: "error", error: (e as Error).message });
+      updateSlide(slide.index, {
+        status: "error",
+        error: (e as Error).message,
+        durationMs: Date.now() - startedAt,
+      });
     }
   }, []);
 
@@ -185,18 +223,31 @@ export function useDeckGenerator() {
     setError(null);
     setTopic("");
     setStatus("idle");
+    setTimings({
+      planStartedAt: null,
+      planMs: null,
+      renderStartedAt: null,
+      renderEndedAt: null,
+    });
   }, []);
 
   const generate = useCallback(
     async (optsOverride?: GenerateOptions) => {
       const opts = optsOverride ?? formOpts;
       if (!opts) return;
+      const planStartedAt = Date.now();
       setStatus("planning");
       setError(null);
       setSlides([]);
       slidesRef.current = [];
       sizeRef.current = aspectToSize(opts.aspect);
       aspectStateRef.current = opts.aspect;
+      setTimings({
+        planStartedAt,
+        planMs: null,
+        renderStartedAt: null,
+        renderEndedAt: null,
+      });
       try {
         const { refImages, refTexts } = buildRefPayload(opts);
         const plan: DeckPlan = await planDeckFn({
@@ -222,11 +273,22 @@ export function useDeckGenerator() {
           status: "pending",
           dataUrl: null,
           error: null,
+          startedAt: null,
+          durationMs: null,
+          usage: null,
+          costUsd: null,
         }));
         setSlides(initial);
         slidesRef.current = initial;
+        const renderStartedAt = Date.now();
+        setTimings((t) => ({
+          ...t,
+          planMs: renderStartedAt - planStartedAt,
+          renderStartedAt,
+        }));
         setStatus("rendering");
         await renderAll(normalized);
+        setTimings((t) => ({ ...t, renderEndedAt: Date.now() }));
         setStatus("ready");
       } catch (e) {
         setError((e as Error).message);
@@ -256,6 +318,7 @@ export function useDeckGenerator() {
     error,
     chat,
     formOpts,
+    timings,
     startRefinement,
     sendChat,
     generate,

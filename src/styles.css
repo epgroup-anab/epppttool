@@ -142,3 +142,24 @@
     color: var(--color-foreground);
   }
 }
+
+/* Shimmer used by loading slide tiles */
+@keyframes ep-shimmer {
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+.shimmer::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.06),
+    transparent
+  );
+  animation: ep-shimmer 1.6s infinite;
+}

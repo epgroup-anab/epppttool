@@ -1,16 +1,31 @@
 import { createParser } from "eventsource-parser";
 import { flushSync } from "react-dom";
+import type { ImageUsage } from "./pricing";
 
 type ImageEventPayload =
-  | { type: "image_generation.partial_image"; b64_json: string; partial_image_index: number; created_at: number }
-  | { type: "image_generation.completed"; b64_json: string; created_at: number };
+  | {
+      type: "image_generation.partial_image";
+      b64_json: string;
+      partial_image_index: number;
+      created_at: number;
+    }
+  | {
+      type: "image_generation.completed";
+      b64_json: string;
+      created_at: number;
+      usage?: ImageUsage;
+    };
+
+export type StreamImageResult = {
+  usage?: ImageUsage;
+};
 
 export async function streamImage(
   endpoint: string,
   prompt: string,
   onFrame: (dataUrl: string, isFinal: boolean) => void,
   extra?: Record<string, unknown>,
-): Promise<void> {
+): Promise<StreamImageResult> {
   const res = await fetch(endpoint, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -22,6 +37,7 @@ export async function streamImage(
   }
 
   let sawCompleted = false;
+  let usage: ImageUsage | undefined;
   const parser = createParser({
     onEvent(event) {
       if (
@@ -39,7 +55,10 @@ export async function streamImage(
       flushSync(() => {
         onFrame(`data:image/png;base64,${payload.b64_json}`, isFinal);
       });
-      if (isFinal) sawCompleted = true;
+      if (isFinal) {
+        sawCompleted = true;
+        if ("usage" in payload && payload.usage) usage = payload.usage;
+      }
     },
   });
 
@@ -54,4 +73,5 @@ export async function streamImage(
     reader.cancel().catch(() => {});
   }
   if (!sawCompleted) throw new Error("Image stream ended without a completed event");
+  return { usage };
 }

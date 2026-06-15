@@ -1,7 +1,11 @@
 import { useState, useRef } from "react";
-import { Sparkles, Loader2, Upload, X, ImageIcon, FileText, Building2 } from "lucide-react";
+import { Sparkles, Loader2, Upload, X, ImageIcon, FileText, Building2, DollarSign } from "lucide-react";
 import { processUpload, type UploadedRef, type RefRole } from "@/lib/uploads";
 import type { GenerateOptions, StylePreset, Tone, Audience, Aspect } from "@/hooks/useDeckGenerator";
+import { estimateImageCost, formatUsd } from "@/lib/pricing";
+
+const aspectToSize = (a: Aspect) =>
+  a === "16:9" ? "1536x1024" : a === "9:16" ? "1024x1536" : "1024x1024";
 
 const EXAMPLES = [
   "Presentation on Tesco x EP Group collab",
@@ -86,6 +90,8 @@ export function PromptForm({ busy, onGenerate }: Props) {
   const [uploadError, setUploadError] = useState<string | null>(null);
   const [pendingRole, setPendingRole] = useState<RefRole>("style");
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const estCost = estimateImageCost(aspectToSize(aspect), "high") * slideCount;
 
   const handleFiles = async (files: FileList | null) => {
     if (!files) return;
@@ -288,10 +294,23 @@ export function PromptForm({ busy, onGenerate }: Props) {
         </div>
       </div>
 
+      <div className="mt-6 flex items-center justify-between rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-sm">
+        <div className="flex items-center gap-2 text-white/60">
+          <DollarSign className="size-4 text-white/40" />
+          Est. image cost
+        </div>
+        <div className="text-right">
+          <span className="font-semibold tabular-nums text-white">~{formatUsd(estCost)}</span>
+          <span className="ml-2 text-xs text-white/40">
+            {slideCount} × high · {aspect}
+          </span>
+        </div>
+      </div>
+
       <button
         type="submit"
         disabled={busy || brief.trim().length < 4}
-        className="mt-6 w-full inline-flex items-center justify-center gap-2 rounded-2xl bg-[#E63027] hover:bg-[#cc2a23] disabled:bg-white/10 disabled:text-white/40 text-white font-semibold py-4 text-base transition"
+        className="mt-3 w-full inline-flex items-center justify-center gap-2 rounded-2xl bg-[#E63027] hover:bg-[#cc2a23] disabled:bg-white/10 disabled:text-white/40 text-white font-semibold py-4 text-base transition"
       >
         {busy ? (
           <>
@@ -305,6 +324,9 @@ export function PromptForm({ busy, onGenerate }: Props) {
           </>
         )}
       </button>
+      <div className="mt-2 text-center text-[11px] text-white/35">
+        Estimate only — actual usage is billed by OpenAI and visible on your usage dashboard.
+      </div>
     </form>
   );
 }
