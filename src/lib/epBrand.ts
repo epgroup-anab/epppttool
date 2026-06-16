@@ -43,7 +43,7 @@ LAYOUT SYSTEM (pick one per slide, never mix gradients/textures):
 
 ICONOGRAPHY: line-style icons only, 2pt stroke, in white on dark / blue #2D3645 on light, inside a thin 2pt circle of the same colour. NEVER filled clip-art. Min 25px clear space between any two icons or logos.
 
-PHOTOGRAPHY: editorial photoreal, warm but corporate, full-bleed within its panel OR cropped into a clean circle with a 2pt blue #2D3645 stroke. NEVER floating rectangles with drop shadows.
+PHOTOGRAPHY: editorial photoreal, warm but corporate, full-bleed within its panel OR cropped into a clean circle with a 2pt blue #2D3645 stroke. NEVER floating rectangles with drop shadows. DO NOT depict human faces, portraits or headshots — favour packaging, products, factories, warehouse racking, branded lorries, ports, conveyor lines and operations. People may appear only incidentally (small, from behind, hands-only), never as a posed portrait, founder headshot or "team at a laptop" cliché.
 
 EP HOUSE STYLE — the single most important reference (study this carefully):
 - Real EP decks are predominantly WHITE / very light canvases. White is the dominant background; Dark Blue #1C232F is used for compact HEADER BARS, the centre hub of diagrams, footer ribbons and selected panels — NOT as a full-bleed background on most slides. Avoid dark-heavy slides except the cover and section dividers.
@@ -79,9 +79,9 @@ SLIDE ARCHETYPES — pick the best match per slide role:
 
 (7) PARTNERSHIP / CUSTOMER VALUE — Top: kicker + headline + intro + large centred quote with red quotation mark. Middle: 4 white cards with gradient-circle icons (cost, resilience, sustainability, innovation) + bullet lists. Below: two-column challenge-to-solution matrix (red header left, navy header right). Partner logo wall in 4×3 grid on pale #F4F5F6 panel. 7-step horizontal workflow strip with numbered circles and arrows. Dark footer with key message + 3 proof icons.
 
-(8) CULTURE / DNA — Three-column grid: values icon grid (2×3), pillar cards with circular icons + descriptions, people development section with icons + warehouse team photo (diagonal crop edge). Dark footer with people/country/location stats + unity slogan.
+(8) CULTURE / DNA — Three-column grid: values icon grid (2×3), pillar cards with circular icons + descriptions, and a development section with icons + a facility/operations photo (warehouse aisle, production line — NO posed people, diagonal crop edge). Dark footer with people/country/location stats + unity slogan.
 
-PRODUCT PHOTOGRAPHY: curated studio still-lifes — corrugate, cartons, bags, mailers, trays, bottles, retail-ready packaging on seamless white or in warehouse scenes. Branded EP lorries, modern facilities, executive portraiture, dashboard mockups. No stock clichés.
+PRODUCT PHOTOGRAPHY: curated studio still-lifes — corrugate, cartons, bags, mailers, trays, bottles, retail-ready packaging on seamless white or in warehouse scenes. Branded EP lorries, modern facilities, conveyor/production lines, dashboard mockups. No human portraits, no stock clichés.
 
 LOGO / WORDMARK RENDERING RULES — extremely important:
 - Never restyle, redraw, stretch, outline, bevel, shadow, or decorate logos.
@@ -90,5 +90,5 @@ LOGO / WORDMARK RENDERING RULES — extremely important:
 - When multiple logos appear, place them in a dedicated clean panel or strip with equal spacing and consistent baseline alignment. Never scatter them around the composition.
 - If the model is likely to struggle with a logo, reduce logo count and make the surrounding design carry the slide quality rather than inventing distorted marks.
 
-HARD BANS — repeat as a single line at the end of every imagePrompt: "no watermarks, no lorem ipsum, no garbled or misspelled text, no drop-shadows on type, no rainbow or purple/blue gradients, no neon, no teal, no clip-art, no stock-photo handshakes/globes/lightbulbs/arrows-over-cities, no AI artefacts on letterforms or logos, no extra fingers or distorted faces, no invented partner logos — render partner marks faithfully in their real brand colours."
+HARD BANS — repeat as a single line at the end of every imagePrompt: "no human faces, portraits or headshots, no watermarks, no lorem ipsum, no garbled or misspelled text, no drop-shadows on type, no rainbow or purple/blue gradients, no neon, no teal, no clip-art, no stock-photo handshakes/globes/lightbulbs/arrows-over-cities, no AI artefacts on letterforms or logos, no invented partner logos — render partner marks faithfully in their real brand colours."
 `.trim();

@@ -62,6 +62,25 @@ export const planDeck = createServerFn({ method: "POST" })
 
     const aspectLabel = data.aspect === "16:9" ? "widescreen 16:9" : data.aspect === "1:1" ? "square 1:1" : "portrait 9:16";
 
+    // Inject a fresh "art-direction rhythm" each run so no two decks come out
+    // structurally identical. The planner uses this as the deck's organising idea.
+    const VARIATION_RHYTHMS = [
+      "FULL-BLEED EDITORIAL: lead with large photography that bleeds off the page on covers and dividers; content slides stay white and structured. Favour diagonal photo wedges and circular photo crops.",
+      "SWISS GRID: a disciplined modular grid throughout — strong column structure, lots of hairline dividers, numbered modules, restrained photography in neat tiles. Minimal, confident, lots of white.",
+      "DATA-FORWARD: foreground charts, KPI bands and comparison matrices; every slide carries at least one quantified proof element. Stats are the heroes, photography is supporting.",
+      "DIAGRAM-LED: lean on hub-and-spoke wheels, process flows, timelines and connected-pillar systems as the dominant visual on most content slides.",
+      "MAGAZINE FEATURE: bold oversize headlines, generous leading, pull-quotes, and a strong one-big-idea-per-slide rhythm with a single dominant image or module each.",
+      "PANEL & CARD SYSTEM: compose slides from clearly bordered cards and navy header-bar panels (like the product-grid slide) — everything sits in tidy containers.",
+    ];
+    const VARIATION_OPENERS = [
+      "Open the deck with a full-bleed photographic cover.",
+      "Open the deck with a clean white left-panel cover and a photographic right column.",
+      "Open the deck with a bold typographic cover where the headline dominates and imagery is secondary.",
+    ];
+    const rhythm = VARIATION_RHYTHMS[Math.floor(Math.random() * VARIATION_RHYTHMS.length)];
+    const opener = VARIATION_OPENERS[Math.floor(Math.random() * VARIATION_OPENERS.length)];
+    const variationDirective = `\n\nDECK ART-DIRECTION FOR THIS GENERATION (vary structure run-to-run — do NOT default to the same template every time):\n- Organising rhythm: ${rhythm}\n- ${opener}\n- Deliberately differ from a "standard" EP deck: change which archetypes appear and their order, vary headline placement (left / centred / lower-third), alternate photo treatments (full-bleed vs circular vs wedge vs grid vs labelled), and avoid repeating the same layout twice. Two different briefs must never produce near-identical decks.`;
+
     const presetBlock = {
       creative: "STYLE PRESET = CREATIVE. Cinematic full-bleed editorial photography paired with oversize Gotham Rounded display headlines in red #C04A4D on dark blue #1C232F, OR blue #2D3645 on white. Lean on the dark-over-light split (layout a) and full-dark stencil (layout b) from the brand contract. Hero photography is a full-bleed top band OR a clean circle with a 2pt #2D3645 stroke — never a floating rectangle with a drop shadow. Use a single bold red #C04A4D circle 'claim badge' (e.g. 'We are the #1 paper bag manufacturer in the UK & #2 in Europe') anchored to a corner. Magazine-editorial energy (Pentagram × Bloomberg Businessweek × Apple keynote) but rendered strictly inside the EP palette.",
       balanced: "STYLE PRESET = BALANCED — the standard EP corporate deck. Every slide pairs ONE strong visual idea with structured supporting information. Cycle the four canonical layouts from the brand contract: (a) dark-over-light split with hero photo + red headline above, stats/logos strip below; (b) full dark blue with oversize stencil section number ('01', '02') + section headline + 3 line-icons in circles + division logo footer rule; (c) full white hub-and-spoke diagram with 3 numbered red circles and 'ep make it easy' centre; (d) data slide with a hand-crafted chart above and red percentage figures below. Art-directed and information-rich.",
@@ -129,15 +148,22 @@ DENSITY & PHOTO-REALISM MANDATE (this is the difference between an OK slide and 
 - Include EP credibility furniture where the role fits: sub-brand/division logo wall (europackaging, coppice, euro MPB, Jena, sirane, Walkers Chocolates, AB Group), award badges (Ecovadis Platinum roundel, Queen's Award, FPA), and a red claim-badge circle.
 - LEGIBILITY: prefer fewer, LARGER, correctly-spelled labels over many tiny ones. Specify exact short text strings so the model renders crisp type. Headlines should be genuinely oversized (80–130pt) and confident.
 
+TYPOGRAPHIC POLISH & FINISH (the difference between "AI slide" and "agency slide"):
+- Lock everything to a strict column grid with a consistent generous outer margin (≈64px) and even gutters; every element is intentionally aligned to that grid, not floated freely.
+- Crisp typographic hierarchy with clear, deliberate size jumps (oversize headline → mid subhead → small body → tiny caption). Tight, even letter-spacing; comfortable leading; sentence case for headlines; ALL-CAPS only for small kicker/label chips.
+- Refined detailing: hairline 1px dividers in #6B7280 at low opacity, consistent corner radii across all cards, equal padding inside every panel, balanced negative space so dense slides still breathe.
+- Restrained, premium colour use: white/light canvas, ONE confident red accent moment per slide, navy for structure. Avoid flat clip-art shading, faux-3D, heavy borders, and uneven drop shadows.
+- Flat, vector-clean infographics and charts (no skeuomorphic bevels). Everything should read as print-ready board-deck design at 4K.
+
 SLIDE ARCHETYPE MAP — assign each slide the best-matching archetype from the brand contract and describe its zones explicitly:
 - cover → Archetype (1) COVER: left wordmark/headline block + right diagonal image triptych + bottom stat ribbon.
-- section / about → Archetype (2) ABOUT: founder portrait + timeline + stat row + capability strip + dark footer mission bar.
+- section / about → Archetype (2) ABOUT: oversize section number or red headline + labelled aerial facility photo + timeline + stat row + capability strip + sub-brand/award logo wall (NO human portraits).
 - content (products) → Archetype (3) PRODUCTS: hero still-life left + 3×3 category grid right + footer pillars.
 - content (footprint) → Archetype (4) FOOTPRINT: map with pins + stat strip + discipline list + capability banner.
 - content (framework) → Archetype (5) FRAMEWORK: comparison boxes + radial hub-and-spoke + industry icon row.
 - stats / sustainability → Archetype (6) SUSTAINABILITY: quant proof + circular framework + dashboard evidence + photo footer.
 - case-study / partnership → Archetype (7) PARTNERSHIP: quote + 4 pillar cards + challenge/solution matrix + logo wall + 7-step workflow.
-- content (culture) → Archetype (8) CULTURE: values grid + pillar cards + team photo + stats footer.
+- content (culture) → Archetype (8) CULTURE: values grid + pillar cards + facility/operations photo (NO posed people) + stats footer.
 - closing → simplified COVER variant: CTA headline, contact details, co-brand lockup, 2–3 proof stats, dark footer.
 
 NON-NEGOTIABLE EXECUTION RULES:
@@ -145,7 +171,7 @@ NON-NEGOTIABLE EXECUTION RULES:
 - Never ask the model to invent a busy scene when a clean information panel would communicate better.
 - Use fewer, larger, more legible modules rather than many tiny unreadable ones.
 - Make panels, bands, cards, wedges, separators, and grids explicit with sizes/positions so the result feels designed.
-- Where applicable, specify that supporting photography should look like real packaging, factories, warehouse racks, branded lorries, retail products, dashboards, sustainability materials, or executive portraiture — not stock-business cliches.
+- Where applicable, specify that supporting photography should look like real packaging, factories, warehouse racks, branded lorries, retail products, dashboards or sustainability materials — never posed people, founder portraits or "team at a laptop" stock cliches.
 
 ================= FIXED IMAGE-PROMPT TEMPLATE (use this exact structure, labelled, for EVERY slide) =================
 OVERALL LAYOUT: name ONE of layouts (a)–(d) from the EP brand contract and describe how the frame is split — e.g. "Layout (a): top two-thirds Dark Blue #1C232F, bottom third white #FFFFFF. 60px outer margin on all sides."
@@ -176,17 +202,19 @@ HARD BANS (paste verbatim as one line): "no watermarks, no lorem ipsum, no garbl
 
 VARIETY RULES across the deck:
 - No two consecutive slides may share the same layout letter (a)/(b)/(c)/(d) OR the same archetype number (1)–(8).
-- Slide 1 = Archetype (1) COVER: left white panel with large co-brand lockup (EP lockup + 'x' + partner logo, ~280px wide), two-line headline (line 1 #2D3645, line 2 #C04A4D), body paragraph, capability icon row; right half = three diagonal image wedges (packaging / branded lorry / port); bottom stat ribbon with 3–4 KPIs. Footer chrome (epgroup.co.uk + 'ep make it easy'). NO 'Page N of N' on the cover.
+- Slide 1 = COVER following the art-direction opener above. Always include: large co-brand lockup (EP lockup + 'x' + partner logo), a confident headline (two-tone #2D3645 / #C04A4D), a short body line, a capability icon row, real EP photography (packaging / branded lorry / port — never a person), and a bottom stat ribbon with 3–4 KPIs. Footer chrome (epgroup.co.uk + 'ep make it easy'). NO 'Page N of N' on the cover.
 - Final slide = closing / next-steps / contact CTA.
 - 'role' values allowed: cover | section | content | stats | case-study | closing.
 - 'title' is a short 2–5 word UI label, NOT the slide headline.
 - Aspect ratio for every prompt: ${aspectLabel}.
 - Build in deck-like variety: at least one Archetype (3) products slide, one Archetype (4) footprint slide when relevant, one Archetype (5) framework slide when relevant, one Archetype (6) or stats slide, and one Archetype (7) partnership slide when relevant to the brief.
+- DIVERSIFY run-to-run: honour the DECK ART-DIRECTION rhythm above. Do not always pick the same archetypes in the same order — choose the mix that best fits THIS brief, and vary layouts, photo treatments and headline placement so repeated generations feel genuinely different.
+- The archetypes are a flexible menu, not a fixed script: you may merge, reorder, or substitute them, and invent new on-brand compositions, as long as every slide stays dense, white-dominant, polished and on-palette.
 - Make each prompt specify enough panel structure that the image model can render readable, premium slide architecture.
 
 CONSISTENCY: the co-brand lockup must be described IDENTICALLY on every slide (same partner logo description, same colours, same size) so the image model renders it consistently across the deck. Repeat the full partner-logo description verbatim in every prompt — do not abbreviate to "as before".
 
-QUALITY BAR: if a prompt could be reused on any other company's deck unchanged, it is too generic. Make every prompt unmistakably about THIS brief, THIS partner, THIS slide role.${brandBlock}${textRefsBlock}${chatBlock}`;
+QUALITY BAR: if a prompt could be reused on any other company's deck unchanged, it is too generic. Make every prompt unmistakably about THIS brief, THIS partner, THIS slide role.${variationDirective}${brandBlock}${textRefsBlock}${chatBlock}`;
 
     const userContent: Array<
       | { type: "text"; text: string }
